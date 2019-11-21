@@ -1,0 +1,7 @@
+*.exe
+*.xlsx
+datamtsnj.json
+local.py
+login.py
+online.py
+desa.sql
