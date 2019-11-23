@@ -6,7 +6,6 @@ import (
 	"database/sql"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/ilamazuliaf/desaku/models"
 
@@ -26,7 +25,8 @@ const (
 	personSelectBase = `SELECT person.uuid, person.nokk, person.nik, person.nama, person.jk, person.tempat_lahir,
 			person.tanggal_lahir, person.anak_ke, person.jum_saudara, person.phone1,
 			person.phone2, pendidikan.id, pendidikan.nama, pekerjaan.id, pekerjaan.nama,
-			penghasilan.id, penghasilan.keterangan, person.pembuat, person.wafat
+			penghasilan.id, penghasilan.keterangan, person.pembuat, person.wafat, 
+			timestampdiff (year, person.tanggal_lahir, curdate()) as age
 			FROM person LEFT JOIN pendidikan ON person.id_pendidikan = pendidikan.id
 			LEFT JOIN pekerjaan ON person.id_pekerjaan = pekerjaan.id
 			LEFT JOIN penghasilan ON person.id_penghasilan = penghasilan.id `
@@ -105,11 +105,11 @@ func (m *mysqlConfig) getPerson(ctx context.Context, query string, args ...inter
 			&P.UUID, &P.NoKK, &P.NIK, &P.Nama, &P.JK, &P.TempatLahir, &P.TanggalLahir,
 			&P.AnakKe, &P.JumSaudara, &P.Phone1, &P.Phone2, &pendidikan.Id, &pendidikan.Nama,
 			&pekerjaan.Id, &pekerjaan.Nama,
-			&penghasilan.Id, &penghasilan.Keterangan, &P.Pembuat, &P.Wafat,
+			&penghasilan.Id, &penghasilan.Keterangan, &P.Pembuat, &P.Wafat, &P.Umur,
 		); err != nil {
 			return nil, err
 		}
-		P.Umur = cekUmur(P.TanggalLahir)
+		// P.Umur = cekUmur(P.TanggalLahir)
 		P.Pendidikan = pendidikan
 		P.Pekerjaan = pekerjaan
 		P.Penghasilan = penghasilan
@@ -254,19 +254,19 @@ func (m *mysqlConfig) InsertPerson(ctx context.Context, a *models.Person, pembua
 	return nil
 }
 
-func cekUmur(kelahiran string) int {
-	var format = "2006-01-02"
-	t, err := time.Parse(format, kelahiran)
-	if err != nil {
-		return 0
-	}
-	s := time.Now()
-	sekarang := s.Year()
+// func cekUmur(kelahiran string) int {
+// 	var format = "2006-01-02"
+// 	t, err := time.Parse(format, kelahiran)
+// 	if err != nil {
+// 		return 0
+// 	}
+// 	s := time.Now()
+// 	sekarang := s.Year()
 
-	if t.Month() > s.Month() {
-		sekarang-- // = sekarang - 1
-	} else if t.Month() == s.Month() && t.Day() > s.Day() {
-		sekarang--
-	}
-	return sekarang - t.Year()
-}
+// 	if t.Month() > s.Month() {
+// 		sekarang-- // = sekarang - 1
+// 	} else if t.Month() == s.Month() && t.Day() > s.Day() {
+// 		sekarang--
+// 	}
+// 	return sekarang - t.Year()
+// }
