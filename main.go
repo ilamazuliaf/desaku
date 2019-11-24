@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/ilamazuliaf/desaku/delivery"
-	"github.com/ilamazuliaf/desaku/middlewares"
 	"github.com/ilamazuliaf/desaku/models"
 	"github.com/ilamazuliaf/desaku/repository"
 	"github.com/ilamazuliaf/desaku/usecase"
@@ -56,7 +55,7 @@ func main() {
 
 	e := echo.New()
 	e.Use(middleware.Gzip())
-	e.Use(echo.WrapMiddleware(middlewares.MiddlewareJWTAuthorization))
+	// e.Use(echo.WrapMiddleware(middlewares.MiddlewareJWTAuthorization))
 	e.Validator = &models.CustomValidator{Validator: validator.New()}
 
 	timeOut := time.Duration(viper.GetInt("context.timeout")) * time.Second
